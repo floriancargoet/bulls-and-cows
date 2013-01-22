@@ -1,11 +1,17 @@
 /*jshint  node:true */
+var fs = require('fs');
 
 var Game = function (options) {
     this.goal = generate(options);
+    this.guesses = 0;
     this.length = options.length;
     if (options.debug) {
         console.log('String to guess', this.goal);
     }
+};
+
+Game.prototype.reset = function () {
+    this.guesses = 0;
 };
 
 Game.prototype.guess = function (s) {
@@ -27,8 +33,11 @@ Game.prototype.guess = function (s) {
             result.bad++;
         }
     });
+
+    this.guesses++;
     if (result.good === l) {
         result.won = true;
+        result.guesses = this.guesses;
     }
     return result;
 };
@@ -39,6 +48,8 @@ function generate(options) {
             return generateDigits(options);
         case 'letters' :
             return generateLetters(options);
+        case 'words' :
+            return generateWords(options);
     }
 }
 
@@ -75,6 +86,39 @@ function generateLetters(options) {
         }
     }
     return s;
+}
+
+var cache = {};
+function generateWords(options) {
+    var dict = options.dict;
+    if (!dict || !fs.existsSync(dict)) {
+        console.log('File not found: ' + dict);
+        dict = '/usr/share/dict/british-english';
+    }
+
+    if (!cache[dict]) {
+        // build a cache of words
+        cache[dict] = fs.readFileSync(dict, 'utf8')
+            .split('\n')
+            .filter(function (word){
+                return /^[a-z]+$/.test(word);
+            });
+    }
+    var words = cache[dict];
+    words = words.filter(function(word) {
+        if (word.length === options.length) {
+            var allDifferent = true;
+            for (var i = 0; i < word.length; i++) {
+                if (word.indexOf(word[i]) !== i) {
+                    allDifferent = false;
+                    break;
+                }
+            }
+            return allDifferent;
+        }
+    });
+
+    return words[Math.floor(Math.random() * words.length)];
 }
 
 module.exports = exports = Game;
