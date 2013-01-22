@@ -2,8 +2,9 @@
 var fs = require('fs');
 
 var Game = function (options) {
+    this.reset();
     this.goal = generate(options);
-    this.guesses = 0;
+    this.mode = options.mode;
     this.length = options.length;
     if (options.debug) {
         console.log('String to guess', this.goal);
@@ -12,6 +13,7 @@ var Game = function (options) {
 
 Game.prototype.reset = function () {
     this.guesses = 0;
+    this.won = false;
 };
 
 Game.prototype.guess = function (s) {
@@ -35,8 +37,9 @@ Game.prototype.guess = function (s) {
     });
 
     this.guesses++;
+
     if (result.good === l) {
-        result.won = true;
+        result.won = this.won = true;
         result.guesses = this.guesses;
     }
     return result;
@@ -91,9 +94,11 @@ function generateLetters(options) {
 var cache = {};
 function generateWords(options) {
     var dict = options.dict;
-    if (!dict || !fs.existsSync(dict)) {
-        console.log('File not found: ' + dict);
+    if (!dict) {
         dict = '/usr/share/dict/british-english';
+    }
+    if (!fs.existsSync(dict)) {
+        console.log('File not found: ' + dict);
     }
 
     if (!cache[dict]) {
