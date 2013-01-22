@@ -33,8 +33,12 @@ var scores = {
 
         if (score.guesses_1 === score.guesses_2) {
             score.winner = 'draw';
+        } else if (score.guesses_1 === 0) {
+            score.winner = bot2_file;
+        } else if (score.guesses_2 === 0) {
+            score.winner = bot1_file;
         } else {
-            score.winner = (score.guesses_1 > score.guesses_2 ? bot1_file : bot2_file);
+            score.winner = (score.guesses_1 < score.guesses_2 ? bot1_file : bot2_file);
         }
     }
 });
