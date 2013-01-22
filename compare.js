@@ -40,6 +40,13 @@ var scores = {
         } else {
             score.winner = (score.guesses_1 < score.guesses_2 ? bot1_file : bot2_file);
         }
+
+        if (typeof bot1.reset === 'function') {
+            bot1.reset();
+        }
+        if (typeof bot2.reset === 'function') {
+            bot2.reset();
+        }
     }
 });
 
