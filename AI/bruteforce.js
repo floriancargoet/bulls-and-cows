@@ -1,93 +1,73 @@
 /*jshint  node:true */
 
-var Game = require('../game.js');
-
-var gd = new Game({
-    length : 4,
-    mode : 'digits',
-    debug : true
-});
-
-// brute force method
-for (var i = 123; i < 10000; i++) {
-    var s = String(i);
-    if (s.length < 4) {
-        s = '0' + s;
-    }
-    var unique = true;
-    Array.prototype.slice.call(s).forEach(function (c, i) {
-        if (s.indexOf(c) !== i) {
-            unique = false;
-        }
-    });
-
-    if (unique) {
-        var result = gd.guess(s);
-        if (result.won) {
-            console.log('Found', s, 'in', result.guesses, 'guesses');
-            break;
+function allDifferent(word){
+    for (var i = 0; i < word.length; i++) {
+        if (word.indexOf(word[i]) !== i) {
+            return false;
         }
     }
+    return true;
 }
-
-
-var gl = new Game({
-    length : 4,
-    mode : 'letters',
-    debug : true
-});
 
 var letters = 'abcdefghijklmnopqrstuvwxyz';
 
-// brute force method
-var s;
-var i, j, k, l;
-outerloop:
-for (i = 0; i < 26; i++) {
-    for (j = 0; j < 26; j++) {
-        if (i === j) continue;
-        for (k = 0; k < 26; k++) {
-            if (i === k || j === k) continue;
-            for (l = 0; l < 26; l++) {
-                if (i === l || j === l || k === l) continue;
-                s = letters[i] + letters[j] + letters[k] + letters[l];
-                var result = gl.guess(s);
-                if (result.won) {
-                    console.log('Found', s, 'in', result.guesses, 'guesses');
-                    break outerloop;
-                }
+function base26(i) {
+    var r, s = '';
+    while (i !== 0) {
+        r = i%26;
+        i = (i-r)/26;
+        s = letters[r] + s;
+    }
+    return s;
+}
+var BruteForceAI = function() {
+};
+
+BruteForceAI.prototype.play = function (game) {
+    switch (game.mode) {
+        case 'digits' :
+            return this.playDigits(game);
+        case 'letters' :
+        case 'words' :
+            return this.playLetters(game);
+    }
+};
+
+BruteForceAI.prototype.playDigits = function(game) {
+    var start = Math.pow(10, game.length - 1);
+    var end = Math.pow(10, game.length);
+
+    for (var i = start; i < end; i++) {
+        var s = String(i);
+        if (s.length < game.length) {
+            s = '0' + s;
+        }
+        if (allDifferent(s)) {
+            var result = game.guess(s);
+            if (result.won) {
+                return;
             }
         }
     }
-}
+};
 
-var gw = new Game({
-    length : 4,
-    mode : 'words',
-    dict : '/usr/share/dict/french',
-    debug : true
-});
+BruteForceAI.prototype.playLetters = function(game) {
+    var word;
+    var start = Math.pow(26, game.length - 2); // start = "baaaa…"
+    var end = Math.pow(26, game.length) - 1;       // end = "zzzz…"
+    for (var i = start; i <= end; i++) {
+        word = base26(i);
+        if (word.length < game.length) {
+            word = 'a' + word;
+        }
 
-var letters = 'abcdefghijklmnopqrstuvwxyz';
-
-// brute force method
-var s;
-var i, j, k, l;
-outerloop:
-for (i = 0; i < 26; i++) {
-    for (j = 0; j < 26; j++) {
-        if (i === j) continue;
-        for (k = 0; k < 26; k++) {
-            if (i === k || j === k) continue;
-            for (l = 0; l < 26; l++) {
-                if (i === l || j === l || k === l) continue;
-                s = letters[i] + letters[j] + letters[k] + letters[l];
-                var result = gw.guess(s);
-                if (result.won) {
-                    console.log('Found', s, 'in', result.guesses, 'guesses');
-                    break outerloop;
-                }
+        if (allDifferent(word)) {
+            var result = game.guess(word);
+            if (result.won) {
+                return;
             }
         }
     }
-}
+};
+
+module.exports = exports = BruteForceAI;
