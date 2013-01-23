@@ -1,12 +1,20 @@
+var fs = require('fs');
+var path = require('path');
+
 var Game = require('./game.js');
+
 var args = process.argv;
 args.shift(); // node
 args.shift(); // compare.js
-var botFiles = args;
 
+var botFiles = args;
 var bots = [];
 var i = 1;
 botFiles.forEach(function (botFile) {
+    var file = path.resolve(process.cwd(), botFile);
+    if (fs.existsSync(file)) { // file or module ?
+        botFile = file;
+    };
     bots.push({
         name : i++,
         file : botFile,
