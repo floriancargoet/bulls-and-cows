@@ -20,7 +20,7 @@ Game.prototype.guess = function (s) {
     var l = this.length;
 
     if (typeof s !== 'string' || s.length !== l) {
-        throw new Error('Bad input. Must be a string of length ' + l);
+        throw new Error('Bad input (' + s + '). Must be a string of length ' + l);
     }
 
     var result = {
