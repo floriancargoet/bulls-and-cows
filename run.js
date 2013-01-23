@@ -43,8 +43,8 @@ var scores = {};
             score['Time for Bot ' + bot.name] = new Date() - t;
 
             game.reset();
-            if (typeof bot.reset === 'function') {
-                bot.reset();
+            if (typeof bot.instance.reset === 'function') {
+                bot.instance.reset();
             }
         });
     }
