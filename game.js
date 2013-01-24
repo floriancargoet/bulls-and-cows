@@ -1,11 +1,24 @@
 /*jshint  node:true */
 var fs = require('fs');
 
+function allDifferent(word) {
+    for (var i = 0; i < word.length; i++) {
+        if (word.indexOf(word[i]) !== i) {
+            return false;
+        }
+    }
+    return true;
+}
+
 var Game = function (options) {
     this.reset();
     this.goal = generate(options);
+
+    // exposed to bots
     this.mode = options.mode;
+    this.alphabet = options.alphabet;
     this.length = options.length;
+
     if (options.debug) {
         console.log('String to guess', this.goal);
     }
@@ -56,6 +69,14 @@ function generate(options) {
             return generateSymbols(options);
         case 'letters' :
             options.alphabet = 'abcdefghijklmnopqrstuvwxyz';
+            return generateSymbols(options);
+        case 'alphabet' :
+            if (!options.alphabet || typeof options.alphabet !== 'string') {
+                throw new Error('You must provide an alphabet');
+            }
+            if (!allDifferent(options.alphabet)) {
+                throw new Error('Bad alphabet (' + options.alphabet + '). All symbols must be different.');
+            }
             return generateSymbols(options);
         case 'words' :
             return generateWords(options);

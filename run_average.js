@@ -20,9 +20,21 @@ if (/^[0-9]+$/.test(args[0])) {
 }
 
 var mode = 'digits';
-if ('digits' === args[0] || 'mastermind' === args[0] || 'letters' === args[0] || 'words' === args[0]) {
+if (
+    'digits' === args[0] ||
+    'mastermind' === args[0] ||
+    'letters' === args[0] ||
+    'words' === args[0]
+) {
     mode = args.shift();
 }
+
+var alphabet = '';
+if (args[0] === 'alphabet') {
+    mode = args.shift();
+    alphabet = args.shift();
+}
+
 
 var botFiles = args;
 var bots = [];
@@ -39,12 +51,22 @@ botFiles.forEach(function (botFile) {
     });
 });
 
+console.log('Bots: ', botFiles);
+console.log('Mode: ', mode);
+if (alphabet) {
+    console.log('Alphabet: ', alphabet);
+}
+if (mode !== 'mastermind') {
+    console.log('Length:', l);
+}
+console.log('Runs:', count);
 
 var scores = {};
 for (var i = 0; i < count; i++) {
     var game = new Game({
         length : l,
-        mode : mode
+        mode : mode,
+        alphabet : alphabet
     });
 
     bots.forEach(function (bot) {
