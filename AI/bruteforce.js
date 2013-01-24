@@ -25,6 +25,7 @@ var BruteForceAI = function() {
 
 BruteForceAI.prototype.play = function (game) {
     switch (game.mode) {
+        case 'mastermind' :
         case 'digits' :
             return this.playDigits(game);
         case 'letters' :

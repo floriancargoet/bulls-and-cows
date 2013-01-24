@@ -20,7 +20,7 @@ if (/^[0-9]+$/.test(args[0])) {
 }
 
 var mode = 'digits';
-if ('digits' === args[0] || 'letters' === args[0] || 'words' === args[0]) {
+if ('digits' === args[0] || 'mastermind' === args[0] || 'letters' === args[0] || 'words' === args[0]) {
     mode = args.shift();
 }
 

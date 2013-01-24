@@ -47,41 +47,31 @@ Game.prototype.guess = function (s) {
 
 function generate(options) {
     switch (options.mode) {
+        case 'mastermind':
+            options.length = 4;
+            options.alphabet = '01234567';
+            return generateSymbols(options);
         case 'digits' :
-            return generateDigits(options);
+            options.alphabet = '0123456789';
+            return generateSymbols(options);
         case 'letters' :
-            return generateLetters(options);
+            options.alphabet = 'abcdefghijklmnopqrstuvwxyz';
+            return generateSymbols(options);
         case 'words' :
             return generateWords(options);
     }
 }
 
-function generateDigits(options) {
+function generateSymbols(options) {
     var n = options.length;
-    if (n > 10) {
-        throw new Error('I cannot generate a string of length ' + n + ' because digits must be unique');
-    }
-    var s = '';
-    while (n--) {
-        var c = String(Math.floor(Math.random() * 10));
-        if (s.indexOf(c) === -1) {
-            s += c;
-        } else {
-            n++;
-        }
-    }
-    return s;
-}
+    var alphabet = options.alphabet;
 
-var letters = 'abcdefghijklmnopqrstuvwxyz';
-function generateLetters(options) {
-    var n = options.length;
-    if (n > 26) {
-        throw new Error('I cannot generate a string of length ' + n + ' because letters must be unique');
+    if (n > alphabet.length) {
+        throw new Error('I cannot generate a string of length ' + n + ' because symbols must be unique');
     }
     var s = '';
     while (n--) {
-        var c = letters[Math.floor(Math.random() * 26)];
+        var c = alphabet[Math.floor(Math.random() * alphabet.length)];
         if (s.indexOf(c) === -1) {
             s += c;
         } else {
@@ -105,12 +95,12 @@ function generateWords(options) {
         // build a cache of words
         cache[dict] = fs.readFileSync(dict, 'utf8')
             .split('\n')
-            .filter(function (word){
+            .filter(function (word) {
                 return /^[a-z]+$/.test(word);
             });
     }
     var words = cache[dict];
-    words = words.filter(function(word) {
+    words = words.filter(function (word) {
         if (word.length === options.length) {
             var allDifferent = true;
             for (var i = 0; i < word.length; i++) {
