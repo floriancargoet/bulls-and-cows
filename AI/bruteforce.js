@@ -35,7 +35,7 @@ BruteForceAI.prototype.play = function (game) {
 };
 
 BruteForceAI.prototype.playDigits = function(game) {
-    var start = Math.pow(10, game.length - 1);
+    var start = Math.pow(10, game.length - 2);
     var end = Math.pow(10, game.length);
 
     for (var i = start; i < end; i++) {
