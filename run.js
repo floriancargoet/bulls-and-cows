@@ -10,16 +10,26 @@ args.shift(); // compare.js
 
 var botFiles = args;
 var bots = [];
-var i = 1;
+var names = {};
+
 botFiles.forEach(function (botFile) {
     var file = path.resolve(process.cwd(), botFile);
     if (fs.existsSync(file)) { // file or module ?
         botFile = file;
     }
+    var instance = new (require(botFile));
+    var name = instance.name || 'Unnamed Bot';
+    if (name in names) {
+        names[name]++;
+        name = names[name];
+    } else {
+        names[name] = 1;
+    }
+
     bots.push({
-        name : i++,
+        name : name,
         file : botFile,
-        instance : new (require(botFile))
+        instance : instance
     });
 });
 
@@ -39,11 +49,11 @@ for (var j = 0; j < modes.length; j++) {
         score.goal = game.goal;
 
         bots.forEach(function (bot) {
-            console.log('Bot ' + bot.name + ' playing mode ' + mode + ', length ' + game.length);
+            console.log(bot.name + ' playing mode ' + mode + ', length ' + game.length);
             var t = new Date();
             bot.instance.play(game);
-            score['Guesses for Bot ' + bot.name] = game.won ? game.guesses : 0;
-            score['Time for Bot ' + bot.name] = new Date() - t;
+            score['Guesses for ' + bot.name] = game.won ? game.guesses : 0;
+            score['Time for ' + bot.name] = new Date() - t;
 
             game.reset();
             if (typeof bot.instance.reset === 'function') {

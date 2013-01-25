@@ -38,16 +38,26 @@ if (args[0] === 'alphabet') {
 
 var botFiles = args;
 var bots = [];
-var i = 1;
+var names = {};
+
 botFiles.forEach(function (botFile) {
     var file = path.resolve(process.cwd(), botFile);
     if (fs.existsSync(file)) { // file or module ?
         botFile = file;
     }
+    var instance = new (require(botFile));
+    var name = instance.name || 'Unnamed Bot';
+    if (name in names) {
+        names[name]++;
+        name = name + ' ' + names[name];
+    } else {
+        names[name] = 1;
+    }
+
     bots.push({
-        name : i++,
+        name : name,
         file : botFile,
-        instance : new (require(botFile))
+        instance : instance
     });
 });
 
@@ -70,10 +80,17 @@ for (var i = 0; i < count; i++) {
     });
 
     bots.forEach(function (bot) {
-        bot.instance.play(game);
-        var score = scores['Bot ' + bot.name] || 0;
-        scores['Bot ' + bot.name] = score + (game.won ? game.guesses : Infinity);
-
+        var data = bot.instance.play(game);
+        var score = scores[bot.name + ' - count'] || 0;
+        scores[bot.name + ' - count'] = score + (game.won ? game.guesses : Infinity);
+        if (data) {
+            Object.keys(data).forEach(function (key) {
+                if (typeof data[key] === 'number') {
+                    var value = scores[bot.name + ' - ' + key] || 0;
+                    scores[bot.name + ' - ' + key]  = value + data[key];
+                }
+            });
+        }
         game.reset();
         if (typeof bot.instance.reset === 'function') {
             bot.instance.reset();
