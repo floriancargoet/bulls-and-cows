@@ -103,8 +103,10 @@ function generateSymbols(options) {
 }
 
 var cache = {};
+var alphabetRE = /^[a-z]+$/;
 function generateWords(options) {
     var dict = options.dict;
+    options.alphabet = 'abcdefghijklmnopqrstuvwxyz';
     if (!dict) {
         dict = '/usr/share/dict/british-english';
     }
@@ -117,7 +119,7 @@ function generateWords(options) {
         cache[dict] = fs.readFileSync(dict, 'utf8')
             .split('\n')
             .filter(function (word) {
-                return /^[a-z]+$/.test(word);
+                return alphabetRE.test(word);
             });
     }
     var words = cache[dict];
